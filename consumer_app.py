@@ -20,7 +20,7 @@ def main():
         try:
             # Ejecutar el caso de uso
             resultado = use_case.execute(data)
-            print(f" [✓] Recompensa Procesada:")
+            print(" [✓] Recompensa Procesada:")
             print(f"     - Tarjeta Cliente: {resultado['tarjeta_cliente']}")
             print(f"     - Puntos Ganados: {resultado['puntos_ganados']}")
             print(f"     - Total Acumulado: {resultado['puntos_acumulados']}")
@@ -44,7 +44,4 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         print("\n [*] Saliendo...")
-        try:
-            sys.exit(0)
-        except SystemExit:
-            os._exit(0)
+        sys.exit(0)
