@@ -1,0 +1,43 @@
+name: Build and Analyze
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonar:
+    name: SonarQube Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. Descargar el código del repositorio
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones desactivados para mejor análisis
+
+      # 2. Configurar Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 3. Instalar las dependencias del proyecto
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. Correr las pruebas unitarias y generar coverage.xml
+      - name: Run tests with coverage
+        run: |
+          pytest --cov=. --cov-report=xml --cov-config=.coveragerc
+
+      # 5. Ejecutar el análisis y subirlo a SonarQube
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6.0.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
