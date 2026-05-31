@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Integration & Testing
+.tox/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+htmlcov/
+.pytest_cache/
+.hypothesis/
+
+# SonarQube / SonarCloud
+.sonar/
+.scannerwork/

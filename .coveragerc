@@ -1,0 +1,8 @@
+[run]
+omit =
+    .venv/*
+    tests/*
+    producer_app.py
+    consumer_app.py
+    infrastructure/adapters/rabbitmq_adapter.py
+    infrastructure/config.py
