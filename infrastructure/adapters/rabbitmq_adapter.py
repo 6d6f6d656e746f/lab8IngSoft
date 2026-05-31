@@ -3,7 +3,7 @@ import pika
 from application.ports.message_broker import MessagePublisher, MessageConsumer
 from infrastructure import config
 
-class RabbitMQPublisher(MessagePublisher):
+class BaseRabbitMQAdapter:
     def __init__(self):
         self.credentials = pika.PlainCredentials(config.RABBITMQ_USER, config.RABBITMQ_PASSWORD)
         self.parameters = pika.ConnectionParameters(
@@ -19,6 +19,15 @@ class RabbitMQPublisher(MessagePublisher):
         if not self.connection or self.connection.is_closed:
             self.connection = pika.BlockingConnection(self.parameters)
             self.channel = self.connection.channel()
+
+    def close(self) -> None:
+        if self.connection and self.connection.is_open:
+            self.connection.close()
+
+
+class RabbitMQPublisher(MessagePublisher, BaseRabbitMQAdapter):
+    def __init__(self):
+        BaseRabbitMQAdapter.__init__(self)
 
     def publish(self, topic: str, message: dict) -> None:
         self._connect()
@@ -35,26 +44,12 @@ class RabbitMQPublisher(MessagePublisher):
         print(f" [x] Enviado a RabbitMQ en '{topic}': {body}")
 
     def close(self) -> None:
-        if self.connection and self.connection.is_open:
-            self.connection.close()
+        BaseRabbitMQAdapter.close(self)
 
 
-class RabbitMQConsumer(MessageConsumer):
+class RabbitMQConsumer(MessageConsumer, BaseRabbitMQAdapter):
     def __init__(self):
-        self.credentials = pika.PlainCredentials(config.RABBITMQ_USER, config.RABBITMQ_PASSWORD)
-        self.parameters = pika.ConnectionParameters(
-            host=config.RABBITMQ_HOST,
-            port=config.RABBITMQ_PORT,
-            virtual_host=config.RABBITMQ_VHOST,
-            credentials=self.credentials
-        )
-        self.connection = None
-        self.channel = None
-
-    def _connect(self):
-        if not self.connection or self.connection.is_closed:
-            self.connection = pika.BlockingConnection(self.parameters)
-            self.channel = self.connection.channel()
+        BaseRabbitMQAdapter.__init__(self)
 
     def consume(self, topic: str, callback_fn) -> None:
         self._connect()
@@ -76,6 +71,5 @@ class RabbitMQConsumer(MessageConsumer):
         self.channel.start_consuming()
 
     def close(self) -> None:
-        if self.connection and self.connection.is_open:
-            self.connection.close()
-            print(" [x] Conexión de consumidor de RabbitMQ cerrada.")
+        BaseRabbitMQAdapter.close(self)
+        print(" [x] Conexión de consumidor de RabbitMQ cerrada.")
