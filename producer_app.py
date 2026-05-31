@@ -2,7 +2,10 @@ import sys
 from infrastructure.adapters.rabbitmq_adapter import RabbitMQPublisher
 from application.use_cases import PublishTransactionUseCase
 
-def parse_arguments(monto, tarjeta, restaurante):
+def parse_arguments(default_monto, default_tarjeta, default_restaurante):
+    monto = default_monto
+    tarjeta = default_tarjeta
+    restaurante = default_restaurante
     try:
         monto = float(sys.argv[1])
         if len(sys.argv) > 2:
@@ -14,7 +17,10 @@ def parse_arguments(monto, tarjeta, restaurante):
     return monto, tarjeta, restaurante
 
 
-def prompt_user_inputs(monto, tarjeta, restaurante):
+def prompt_user_inputs(default_monto, default_tarjeta, default_restaurante):
+    monto = default_monto
+    tarjeta = default_tarjeta
+    restaurante = default_restaurante
     print("Presiona ENTER para usar los valores por defecto o introduce nuevos:")
     try:
         monto_in = input(f"Monto consumido [{monto}]: ").strip()
